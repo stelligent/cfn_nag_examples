@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: cfn_nag demo template
+
+Resources:
+  EBSVolume:    
+    Type: "AWS::EC2::Volume"
+    Properties:
+      Encrypted: true
+      AvailabilityZone: us-east-1a
+      Size: 100
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+        ImageId: ami-6057e21a
+        AvailabilityZone: us-east-1a
+        InstanceType: t2.nano
+        IamInstanceProfile: !Ref InstanceProfile
+        SecurityGroupIds:
+        - !Ref EC2SecurityGroup
+  MountPoint:
+    Type: AWS::EC2::VolumeAttachment
+    Properties:
+      InstanceId: !Ref EC2Instance
+      VolumeId: !Ref EBSVolume
+      Device: xvdh
+  EC2SecurityGroup:
+      Type: "AWS::EC2::SecurityGroup"
+      Properties:
+        VpcId: vpc-da3c10bc
+        GroupDescription: Sample Security Group
+        SecurityGroupEgress: 
+            -
+              IpProtocol: -1
+              FromPort: 0
+              ToPort: 65535
+              CidrIp: "0.0.0.0/0"
+  LoadBalancer:
+    Type: "AWS::ElasticLoadBalancing::LoadBalancer"
+    Properties:
+      AvailabilityZones:
+        - us-east-1a
+      Listeners:
+        - LoadBalancerPort: '80'
+          InstancePort: '80'
+          Protocol: HTTP
+      Instances:
+      - !Ref EC2Instance
+  InstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties: 
+      Roles:
+        - !Ref InstanceRole
+  InstanceRole:
+    Type: "AWS::IAM::Role"
+    Properties: 
+      Policies: 
+        - 
+          PolicyName: "root"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - 
+                Effect: "Allow"
+                Action: "s3:ListBuckets"
+                Resource: "*"
+      AssumeRolePolicyDocument:
+        {
+           "Version" : "2012-10-17",
+           "Statement": [ {
+              "Effect": "Allow",
+              "Principal": {
+                 "Service": [ "ec2.amazonaws.com" ]
+              },
+              "Action": [ "sts:AssumeRole" ]
+           } ]
+        }
+      
