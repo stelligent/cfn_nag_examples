@@ -13,6 +13,8 @@ cfn_nag is a ruby gem. [Assuming you have Ruby installed already](https://www.ru
 Encrypted EBS volumes are an excellent example of something cfn_nag will help enforce. There's really no reason you _don't_ want your EBS volumes encrypted, so if cfn_nag detects you are provisioning an unencrypted EBS volume, it'll issue and error.
 
     cfn_nag_scan --input-path cfn/volume.yml
+
+Which will produce
     
     ------------------------------------------------------------
     volume.yml
@@ -30,6 +32,8 @@ However, if we encrypt the volume, cfn_nag succeeds:
 
     cfn_nag_scan --input-path cfn/volume-encrypted.yml
 
+Which will produce
+
     ------------------------------------------------------------
     volume-encrypted.yml
     ------------------------------------------------------------
@@ -44,7 +48,9 @@ cfn_nag will complain in two different ways: it will issue **warnings** for patt
 For example, let's look at a tempalte for a EC2 instance, with an IAM role attached, behind an ELB:
 
     cfn_nag_scan --input-path cfn/stack.yml
-    
+
+Which will produce
+
     ------------------------------------------------------------
     cfn/stack.yml
     ------------------------------------------------------------------------------------------------------------------------
