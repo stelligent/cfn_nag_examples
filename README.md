@@ -95,5 +95,38 @@ Which will produce
     
 When used as part of your continuous delivery pipeline, **failures** will cause cfn_nag to return a non-zero error code, which will fail your build.  However, **warnings** will just be printed out, and cfn_nag will exit successfully so your build can continue. 
 
-If the failures are fixed, the build can continue:
+If the failures are fixed, the build can continue, but with warnings:
 
+    cfn_nag_scan --input-path cfn/stack-fixed.yml 
+
+Which will produce
+
+    ------------------------------------------------------------
+    cfn/stack-fixed.yml
+    ------------------------------------------------------------------------------------------------------------------------
+    | WARN W26
+    |
+    | Resources: ["LoadBalancer"]
+    |
+    | Elastic Load Balancer should have access logging enabled
+    ------------------------------------------------------------
+    | WARN W11
+    |
+    | Resources: ["InstanceRole"]
+    |
+    | IAM role should not allow * resource on its permissions policy
+    ------------------------------------------------------------
+    | WARN W5
+    |
+    | Resources: ["EC2SecurityGroup"]
+    |
+    | Security Groups found with cidr open to world on egress
+    ------------------------------------------------------------
+    | WARN W29
+    |
+    | Resources: ["EC2SecurityGroup"]
+    |
+    | Security Groups found egress with port range instead of just a single port
+
+    Failures count: 0
+    Warnings count: 4
