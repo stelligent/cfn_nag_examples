@@ -9,6 +9,35 @@ Resources:
       Encrypted: true
       AvailabilityZone: us-east-1a
       Size: 100
+  InstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties: 
+      Roles:
+        - !Ref InstanceRole
+  InstanceRole:
+    Type: "AWS::IAM::Role"
+    Properties: 
+      Policies: 
+        - 
+          PolicyName: "root"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - 
+                Effect: "Allow"
+                Action: "s3:PutObject"
+                Resource: "arn:aws:s3:::all_the_pdfs"
+      AssumeRolePolicyDocument:
+        {
+           "Version" : "2012-10-17",
+           "Statement": [ {
+              "Effect": "Allow",
+              "Principal": {
+                 "Service": [ "ec2.amazonaws.com" ]
+              },
+              "Action": [ "sts:AssumeRole" ]
+           } ]
+        }
   EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
@@ -32,9 +61,9 @@ Resources:
         SecurityGroupEgress: 
             -
               IpProtocol: -1
-              FromPort: 0
-              ToPort: 65535
-              CidrIp: "0.0.0.0/0"
+              FromPort: 80
+              ToPort: 80
+              CidrIp: "10.0.0.0/8"
   LoadBalancer:
     Type: "AWS::ElasticLoadBalancing::LoadBalancer"
     Properties:
@@ -46,33 +75,3 @@ Resources:
           Protocol: HTTP
       Instances:
       - !Ref EC2Instance
-  InstanceProfile:
-    Type: "AWS::IAM::InstanceProfile"
-    Properties: 
-      Roles:
-        - !Ref InstanceRole
-  InstanceRole:
-    Type: "AWS::IAM::Role"
-    Properties: 
-      Policies: 
-        - 
-          PolicyName: "root"
-          PolicyDocument: 
-            Version: "2012-10-17"
-            Statement: 
-              - 
-                Effect: "Allow"
-                Action: "s3:ListBuckets"
-                Resource: "*"
-      AssumeRolePolicyDocument:
-        {
-           "Version" : "2012-10-17",
-           "Statement": [ {
-              "Effect": "Allow",
-              "Principal": {
-                 "Service": [ "ec2.amazonaws.com" ]
-              },
-              "Action": [ "sts:AssumeRole" ]
-           } ]
-        }
-      

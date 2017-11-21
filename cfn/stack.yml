@@ -6,9 +6,37 @@ Resources:
   EBSVolume:    
     Type: "AWS::EC2::Volume"
     Properties:
-      Encrypted: false
       AvailabilityZone: us-east-1a
       Size: 100
+  InstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties: 
+      Roles:
+        - !Ref InstanceRole
+  InstanceRole:
+    Type: "AWS::IAM::Role"
+    Properties: 
+      Policies: 
+        - 
+          PolicyName: "root"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - 
+                Effect: "Allow"
+                Action: "*"
+                Resource: "*"
+      AssumeRolePolicyDocument:
+        {
+           "Version" : "2012-10-17",
+           "Statement": [ {
+              "Effect": "Allow",
+              "Principal": {
+                 "Service": [ "ec2.amazonaws.com" ]
+              },
+              "Action": [ "sts:AssumeRole" ]
+           } ]
+        }
   EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
@@ -46,33 +74,3 @@ Resources:
           Protocol: HTTP
       Instances:
       - !Ref EC2Instance
-  InstanceProfile:
-    Type: "AWS::IAM::InstanceProfile"
-    Properties: 
-      Roles:
-        - !Ref InstanceRole
-  InstanceRole:
-    Type: "AWS::IAM::Role"
-    Properties: 
-      Policies: 
-        - 
-          PolicyName: "root"
-          PolicyDocument: 
-            Version: "2012-10-17"
-            Statement: 
-              - 
-                Effect: "Allow"
-                Action: "*"
-                Resource: "*"
-      AssumeRolePolicyDocument:
-        {
-           "Version" : "2012-10-17",
-           "Statement": [ {
-              "Effect": "Allow",
-              "Principal": {
-                 "Service": [ "ec2.amazonaws.com" ]
-              },
-              "Action": [ "sts:AssumeRole" ]
-           } ]
-        }
-      
